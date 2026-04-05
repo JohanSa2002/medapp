@@ -1,0 +1,39 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'database_service.dart';
+
+class AuthService {
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final DatabaseService _dbService = DatabaseService();
+
+  Stream<User?> get authStateChanges {
+    return _firebaseAuth.authStateChanges();
+  }
+
+  Future<void> register(String email, String password) async {
+    final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    final db = await _dbService.database;
+    await db.insert('users', {
+      'id': userCredential.user!.uid,
+      'email': email,
+    });
+  }
+
+  Future<void> login(String email, String password) async {
+    await _firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  }
+
+  Future<void> logout() async {
+    await _firebaseAuth.signOut();
+  }
+
+  User? getCurrentUser() {
+    return _firebaseAuth.currentUser;
+  }
+}

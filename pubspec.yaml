@@ -1,0 +1,55 @@
+name: medapp
+description: Medical Reminders App
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  provider: ^6.1.2
+
+  # Base de datos local
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+
+  # Autenticación
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+
+  # Validación
+  email_validator: ^2.1.17
+
+  # Utilidades
+  uuid: ^4.5.1
+
+  # Notificaciones locales
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.4
+
+  # Gráficas
+  fl_chart: ^0.69.0
+
+  # Reportes
+  pdf: ^3.10.8
+  printing: ^5.13.0
+  csv: ^6.0.0
+
+  # Formato de fechas
+  intl: ^0.19.0
+
+  # UI
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

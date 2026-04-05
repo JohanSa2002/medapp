@@ -1,0 +1,22 @@
+# Flutter/Dart
+.dart_tool/
+/.packages
+/.flutter-plugins
+/.flutter-plugins-dependencies
+build/
+pubspec.lock
+
+# IDE
+.idea/
+.vscode/
+
+# macOS
+.DS_Store
+
+# Generated plugin registrant
+**/GeneratedPluginRegistrant.*
+
+# Firebase credentials (sensitive - do not commit)
+google-services.json
+GoogleService-Info.plist
+lib/firebase_options.dart
