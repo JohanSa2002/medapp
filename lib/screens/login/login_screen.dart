@@ -210,21 +210,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 24),
 
                         // Botón principal
-                        SizedBox(
-                          height: 52,
-                          child: ElevatedButton(
-                            onPressed: _isLoading ? null : _handleAuth,
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : Text(_isLogin ? 'Iniciar sesión' : 'Crear cuenta'),
-                          ),
+                        ElevatedButton(
+                          onPressed: _isLoading ? null : _handleAuth,
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(_isLogin ? 'Iniciar sesión' : 'Crear cuenta'),
                         ),
                       ],
                     ),
@@ -268,7 +265,7 @@ class _Label extends StatelessWidget {
     return Text(
       text,
       style: GoogleFonts.inter(
-        fontSize: 13,
+        fontSize: 15,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),

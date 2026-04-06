@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import '../../main.dart';
 import '../../services/auth_service.dart';
 import '../../providers/cita_provider.dart';
+import '../../providers/medicamento_provider.dart';
+import '../../models/medicamento.dart';
 import '../medicamentos/medicamentos_list_screen.dart';
 import '../citas/citas_list_screen.dart';
 import '../registro/registro_data_screen.dart';
@@ -22,8 +24,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    final userId = context.read<AuthService>().getCurrentUser()!.uid;
-    context.read<CitaProvider>().loadCitas(userId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final userId = context.read<AuthService>().getCurrentUser()!.uid;
+      context.read<CitaProvider>().loadCitas(userId);
+      context.read<MedicamentoProvider>().loadMedicamentos(userId);
+    });
   }
 
   String _greeting() {
@@ -74,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text(
                             '${_greeting()}, $firstName',
                             style: GoogleFonts.inter(
-                              fontSize: 22,
+                              fontSize: 26,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
                             ),
@@ -124,6 +130,25 @@ class _HomeScreenState extends State<HomeScreen> {
             sliver: SliverList(
               delegate: SliverChildListDelegate([
 
+                // ─── Medicamentos de hoy ─────────────────────────────────
+                Consumer<MedicamentoProvider>(
+                  builder: (context, provider, _) {
+                    if (provider.medicamentos.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const _SectionTitle('Medicamentos de hoy'),
+                        const SizedBox(height: 12),
+                        ...provider.medicamentos
+                            .map((m) => _MedReminderRow(med: m)),
+                        const SizedBox(height: 24),
+                      ],
+                    );
+                  },
+                ),
+
                 // ─── Próxima cita ─────────────────────────────────────────
                 Consumer<CitaProvider>(
                   builder: (context, provider, _) {
@@ -148,9 +173,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisCount: 2,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  childAspectRatio: 1.05,
+                  mainAxisSpacing: 14,
+                  crossAxisSpacing: 14,
+                  childAspectRatio: 0.92,
                   children: [
                     _MenuTile(
                       icon: Icons.medication_rounded,
@@ -216,7 +241,7 @@ class _SectionTitle extends StatelessWidget {
     return Text(
       text,
       style: GoogleFonts.inter(
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: FontWeight.w700,
         color: AppColors.textPrimary,
       ),
@@ -323,28 +348,28 @@ class _MenuTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
                   color: bgColor,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(icon, color: color, size: 24),
+                child: Icon(icon, color: color, size: 26),
               ),
               const Spacer(),
               Text(
                 label,
                 style: GoogleFonts.inter(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 3),
               Text(
                 subtitle,
                 style: GoogleFonts.inter(
-                  fontSize: 11,
+                  fontSize: 13,
                   color: AppColors.textSecondary,
                 ),
                 maxLines: 1,
@@ -353,6 +378,109 @@ class _MenuTile extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ─── Fila de recordatorio de medicamento (home) ───────────────────────────────
+
+class _MedReminderRow extends StatelessWidget {
+  final Medicamento med;
+  const _MedReminderRow({required this.med});
+
+  String _toAmPm(String hhmm) {
+    final parts = hhmm.split(':');
+    int hour = int.parse(parts[0]);
+    final minute = parts[1];
+    final period = hour >= 12 ? 'PM' : 'AM';
+    if (hour == 0) {
+      hour = 12;
+    } else if (hour > 12) {
+      hour -= 12;
+    }
+    return '$hour:$minute $period';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.divider),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.medication_rounded,
+              color: AppColors.primary,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  med.nombre,
+                  style: GoogleFonts.inter(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  med.dosis,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Wrap(
+            spacing: 5,
+            runSpacing: 4,
+            alignment: WrapAlignment.end,
+            children: med.horarios
+                .take(3)
+                .map(
+                  (h) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 9,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryLight,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      _toAmPm(h),
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
       ),
     );
   }

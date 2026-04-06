@@ -210,32 +210,32 @@ class _CitaCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Expanded(child: Text(cita.doctor, style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary))),
+                          Expanded(child: Text(cita.doctor, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textPrimary))),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(color: _badgeBg(), borderRadius: BorderRadius.circular(20)),
-                            child: Text(cita.estado, style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: accent)),
+                            child: Text(cita.estado, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: accent)),
                           ),
                         ],
                       ),
                       const SizedBox(height: 4),
-                      Text(cita.especialidad, style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+                      Text(cita.especialidad, style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary)),
                       const SizedBox(height: 8),
                       Row(children: [
-                        const Icon(Icons.calendar_today_rounded, size: 13, color: AppColors.textSecondary),
+                        const Icon(Icons.calendar_today_rounded, size: 15, color: AppColors.textSecondary),
                         const SizedBox(width: 6),
-                        Text(cita.fechaFormato, style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+                        Text(cita.fechaFormato, style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary)),
                         const SizedBox(width: 12),
-                        const Icon(Icons.schedule_rounded, size: 13, color: AppColors.textSecondary),
+                        const Icon(Icons.schedule_rounded, size: 15, color: AppColors.textSecondary),
                         const SizedBox(width: 6),
-                        Text(cita.horaFormato, style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary)),
+                        Text(cita.horaFormato, style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary)),
                       ]),
                       if (cita.lugar != null && cita.lugar!.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         Row(children: [
-                          const Icon(Icons.location_on_outlined, size: 13, color: AppColors.textSecondary),
+                          const Icon(Icons.location_on_outlined, size: 15, color: AppColors.textSecondary),
                           const SizedBox(width: 6),
-                          Expanded(child: Text(cita.lugar!, style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary), overflow: TextOverflow.ellipsis)),
+                          Expanded(child: Text(cita.lugar!, style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary), overflow: TextOverflow.ellipsis)),
                         ]),
                       ],
                       const SizedBox(height: 10),
@@ -266,9 +266,20 @@ class _ActionBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
-      child: Row(children: [Icon(icon, size: 14, color: color), const SizedBox(width: 6), Text(label, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: color))]),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: color),
+            const SizedBox(width: 6),
+            Text(label, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: color)),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -238,7 +238,7 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
               Text(
                 'Formato: h:mm AM/PM  (ej: 8:00 AM, 2:30 PM, 9:00 PM)',
                 style: GoogleFonts.inter(
-                    fontSize: 12, color: AppColors.textSecondary),
+                    fontSize: 14, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 10),
               Row(
@@ -319,21 +319,18 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
                 maxLines: 3,
               ),
               const SizedBox(height: 32),
-              SizedBox(
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleSubmit,
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white),
-                        )
-                      : Text(_isEditing
-                          ? 'Guardar cambios'
-                          : 'Guardar medicamento'),
-                ),
+              ElevatedButton(
+                onPressed: _isLoading ? null : _handleSubmit,
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
+                      )
+                    : Text(_isEditing
+                        ? 'Guardar cambios'
+                        : 'Guardar medicamento'),
               ),
               const SizedBox(height: 24),
             ],
@@ -370,7 +367,7 @@ class _Label extends StatelessWidget {
     return Text(
       text,
       style: GoogleFonts.inter(
-        fontSize: 13,
+        fontSize: 15,
         fontWeight: FontWeight.w600,
         color: AppColors.textPrimary,
       ),

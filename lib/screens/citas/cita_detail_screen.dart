@@ -60,7 +60,7 @@ class CitaDetailScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Text(cita.doctor, textAlign: TextAlign.center, style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
               const SizedBox(height: 4),
-              Text(cita.especialidad, style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary)),
+              Text(cita.especialidad, style: GoogleFonts.inter(fontSize: 15, color: AppColors.textSecondary)),
               const SizedBox(height: 12),
               Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6), decoration: BoxDecoration(color: _badgeBg(), borderRadius: BorderRadius.circular(20)), child: Text(cita.estado, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: accent))),
             ]),
@@ -89,13 +89,15 @@ class CitaDetailScreen extends StatelessWidget {
 
           if (!cita.yaPaso) ...[
             const SizedBox(height: 24),
-            SizedBox(
-              height: 52,
-              child: OutlinedButton.icon(
-                onPressed: () => _showDeleteDialog(context),
-                icon: const Icon(Icons.delete_outline_rounded, size: 20),
-                label: Text('Eliminar cita', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-                style: OutlinedButton.styleFrom(foregroundColor: AppColors.error, side: BorderSide(color: AppColors.error.withAlpha(77)), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            OutlinedButton.icon(
+              onPressed: () => _showDeleteDialog(context),
+              icon: const Icon(Icons.delete_outline_rounded, size: 20),
+              label: Text('Eliminar cita', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.error,
+                side: BorderSide(color: AppColors.error.withAlpha(77)),
+                minimumSize: const Size.fromHeight(56),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
           ],
@@ -160,9 +162,9 @@ class _DetailRow extends StatelessWidget {
         Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withAlpha(31), borderRadius: BorderRadius.circular(8)), child: Icon(icon, color: color, size: 18)),
         const SizedBox(width: 14),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+          Text(title, style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
           const SizedBox(height: 4),
-          Text(value, style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+          Text(value, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
         ])),
       ]),
     );

@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: provs,
       child: MaterialApp(
-        title: 'MedApp',
+        title: 'CuidaMed',
         debugShowCheckedModeBanner: false,
         theme: _buildTheme(),
         home: const AuthWrapper(),
@@ -94,13 +94,13 @@ class MyApp extends StatelessWidget {
       displayMedium: GoogleFonts.inter(fontSize: 28, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
       headlineLarge: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
       headlineMedium: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-      titleLarge   : GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
-      titleMedium  : GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
-      titleSmall   : GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
-      bodyLarge    : GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, color: AppColors.textPrimary),
-      bodyMedium   : GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w400, color: AppColors.textSecondary),
-      bodySmall    : GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w400, color: AppColors.textSecondary),
-      labelLarge   : GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.primary),
+      titleLarge   : GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+      titleMedium  : GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
+      titleSmall   : GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w500, color: AppColors.textPrimary),
+      bodyLarge    : GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w400, color: AppColors.textPrimary),
+      bodyMedium   : GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, color: AppColors.textSecondary),
+      bodySmall    : GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w400, color: AppColors.textSecondary),
+      labelLarge   : GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.primary),
     );
 
     return ThemeData(
@@ -139,7 +139,7 @@ class MyApp extends StatelessWidget {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.divider),
@@ -160,11 +160,11 @@ class MyApp extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.error, width: 1.5),
         ),
-        labelStyle: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary),
-        hintStyle: GoogleFonts.inter(fontSize: 14, color: AppColors.textHint),
+        labelStyle: GoogleFonts.inter(fontSize: 16, color: AppColors.textSecondary),
+        hintStyle: GoogleFonts.inter(fontSize: 16, color: AppColors.textHint),
         prefixIconColor: AppColors.textSecondary,
         suffixIconColor: AppColors.textSecondary,
-        errorStyle: GoogleFonts.inter(fontSize: 12, color: AppColors.error),
+        errorStyle: GoogleFonts.inter(fontSize: 13, color: AppColors.error),
       ),
 
       // Botones primarios
@@ -174,9 +174,10 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.white,
           elevation: 0,
           shadowColor: Colors.transparent,
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 24),
+          minimumSize: const Size.fromHeight(56),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          textStyle: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600),
+          textStyle: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
 
@@ -218,7 +219,7 @@ class MyApp extends StatelessWidget {
       // SnackBar
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.textPrimary,
-        contentTextStyle: GoogleFonts.inter(fontSize: 14, color: Colors.white),
+        contentTextStyle: GoogleFonts.inter(fontSize: 15, color: Colors.white),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         behavior: SnackBarBehavior.floating,
         insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
