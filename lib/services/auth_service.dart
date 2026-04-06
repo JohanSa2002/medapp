@@ -45,4 +45,36 @@ class AuthService {
   User? getCurrentUser() {
     return _firebaseAuth.currentUser;
   }
+
+  Future<Map<String, String?>> getUserProfile() async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) return {};
+    final db = await _dbService.database;
+    final rows = await db.query('users', where: 'id = ?', whereArgs: [user.uid]);
+    if (rows.isEmpty) return {'email': user.email};
+    return {
+      'email': rows.first['email'] as String?,
+      'nombre': rows.first['nombre'] as String?,
+      'apellido': rows.first['apellido'] as String?,
+    };
+  }
+
+  Future<void> updateProfile({
+    required String nombre,
+    required String apellido,
+  }) async {
+    final user = _firebaseAuth.currentUser!;
+    await user.updateDisplayName('$nombre $apellido');
+    final db = await _dbService.database;
+    await db.update(
+      'users',
+      {'nombre': nombre, 'apellido': apellido},
+      where: 'id = ?',
+      whereArgs: [user.uid],
+    );
+  }
+
+  Future<void> changePassword(String newPassword) async {
+    await _firebaseAuth.currentUser!.updatePassword(newPassword);
+  }
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../../main.dart';
 import '../../models/cita.dart';
 import '../../providers/cita_provider.dart';
 import '../../providers/notification_provider.dart';
@@ -9,104 +12,96 @@ class CitaDetailScreen extends StatelessWidget {
   final Cita cita;
   final String userId;
 
-  const CitaDetailScreen({
-    super.key,
-    required this.cita,
-    required this.userId,
-  });
+  const CitaDetailScreen({super.key, required this.cita, required this.userId});
 
-  Color _estadoColor() {
-    if (cita.yaPaso) return Colors.grey;
-    if (cita.esHoy) return Colors.orange;
-    return Colors.blue;
+  Color _accentColor() {
+    if (cita.yaPaso) return AppColors.textHint;
+    if (cita.esHoy) return AppColors.warning;
+    return AppColors.primary;
+  }
+
+  Color _badgeBg() {
+    if (cita.yaPaso) return const Color(0xFFF6F6F7);
+    if (cita.esHoy) return AppColors.warningLight;
+    return AppColors.primaryLight;
   }
 
   @override
   Widget build(BuildContext context) {
+    final accent = _accentColor();
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalle de Cita'),
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        title: Text('Detalle', style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          color: AppColors.textPrimary,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) =>
-                    CitaFormScreen(userId: userId, cita: cita),
-              ),
-            ),
+            icon: const Icon(Icons.edit_rounded),
+            color: AppColors.textPrimary,
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => CitaFormScreen(userId: userId, cita: cita))),
           ),
         ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: Chip(
-                label: Text(
-                  cita.estado,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16),
-                ),
-                backgroundColor: _estadoColor(),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 12),
-              ),
-            ),
-            const SizedBox(height: 24),
-            _DetailRow(icon: Icons.person, title: 'Doctor', value: cita.doctor),
-            _DetailRow(
-                icon: Icons.medical_services,
-                title: 'Especialidad',
-                value: cita.especialidad),
-            _DetailRow(
-                icon: Icons.calendar_today,
-                title: 'Fecha',
-                value: cita.fechaFormato),
-            _DetailRow(
-                icon: Icons.access_time,
-                title: 'Hora',
-                value: cita.horaFormato),
-            if (cita.lugar != null && cita.lugar!.isNotEmpty)
-              _DetailRow(
-                  icon: Icons.location_on,
-                  title: 'Lugar',
-                  value: cita.lugar!),
-            if (cita.telefono != null && cita.telefono!.isNotEmpty)
-              _DetailRow(
-                  icon: Icons.phone,
-                  title: 'Teléfono',
-                  value: cita.telefono!),
-            _DetailRow(
-              icon: Icons.notifications,
-              title: 'Recordatorio',
-              value: cita.minutosAntes >= 1440
-                  ? '${cita.minutosAntes ~/ 1440} día(s) antes'
-                  : cita.minutosAntes >= 60
-                      ? '${cita.minutosAntes ~/ 60} hora(s) antes'
-                      : '${cita.minutosAntes} minutos antes',
-            ),
-            if (cita.notas != null && cita.notas!.isNotEmpty)
-              _DetailRow(
-                  icon: Icons.note, title: 'Notas', value: cita.notas!),
-            const SizedBox(height: 32),
-            if (!cita.yaPaso)
-              ElevatedButton(
-                onPressed: () => _showDeleteDialog(context),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Eliminar Cita',
-                    style: TextStyle(fontSize: 16)),
-              ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          // header
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.divider)),
+            child: Column(children: [
+              Container(width: 64, height: 64, decoration: BoxDecoration(color: _badgeBg(), borderRadius: BorderRadius.circular(16)), child: Icon(Icons.calendar_month_rounded, color: accent, size: 34)),
+              const SizedBox(height: 12),
+              Text(cita.doctor, textAlign: TextAlign.center, style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+              const SizedBox(height: 4),
+              Text(cita.especialidad, style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary)),
+              const SizedBox(height: 12),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6), decoration: BoxDecoration(color: _badgeBg(), borderRadius: BorderRadius.circular(20)), child: Text(cita.estado, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: accent))),
+            ]),
+          ),
+
+          const SizedBox(height: 16),
+
+          _InfoSection(children: [
+            _DetailRow(icon: Icons.calendar_today_rounded, color: AppColors.warning, title: 'Fecha', value: cita.fechaFormato),
+            _DetailRow(icon: Icons.schedule_rounded, color: AppColors.primary, title: 'Hora', value: cita.horaFormato),
+            _DetailRow(icon: Icons.notifications_rounded, color: AppColors.secondary, title: 'Recordatorio', value: '1 día antes'),
+          ]),
+
+          if ((cita.lugar != null && cita.lugar!.isNotEmpty) || (cita.telefono != null && cita.telefono!.isNotEmpty)) ...[
+            const SizedBox(height: 12),
+            _InfoSection(children: [
+              if (cita.lugar != null && cita.lugar!.isNotEmpty) _DetailRow(icon: Icons.location_on_outlined, color: const Color(0xFF9B7EDE), title: 'Lugar', value: cita.lugar!),
+              if (cita.telefono != null && cita.telefono!.isNotEmpty) _DetailRow(icon: Icons.phone_outlined, color: AppColors.secondary, title: 'Teléfono', value: cita.telefono!),
+            ])
           ],
-        ),
+
+          if (cita.notas != null && cita.notas!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _InfoSection(children: [_DetailRow(icon: Icons.notes_rounded, color: AppColors.textSecondary, title: 'Notas', value: cita.notas!)]),
+          ],
+
+          if (!cita.yaPaso) ...[
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 52,
+              child: OutlinedButton.icon(
+                onPressed: () => _showDeleteDialog(context),
+                icon: const Icon(Icons.delete_outline_rounded, size: 20),
+                label: Text('Eliminar cita', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                style: OutlinedButton.styleFrom(foregroundColor: AppColors.error, side: BorderSide(color: AppColors.error.withOpacity(0.3)), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 24),
+        ]),
       ),
     );
   }
@@ -114,28 +109,20 @@ class CitaDetailScreen extends StatelessWidget {
   void _showDeleteDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar cita'),
-        content: Text('¿Eliminar cita con ${cita.doctor}?'),
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Eliminar cita', style: GoogleFonts.inter(fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+        content: Text('¿Eliminar la cita con ${cita.doctor}?', style: GoogleFonts.inter(color: AppColors.textSecondary)),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
           TextButton(
             onPressed: () {
+              Navigator.pop(ctx);
               Navigator.pop(context);
-              Navigator.pop(context);
-              context.read<CitaProvider>().deleteCita(
-                    id: cita.id,
-                    userId: userId,
-                    notificationProvider: context.read<NotificationProvider>(),
-                  );
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Cita eliminada')),
-              );
+              context.read<CitaProvider>().deleteCita(id: cita.id, userId: userId, notificationProvider: context.read<NotificationProvider>());
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Cita eliminada', style: GoogleFonts.inter())));
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Eliminar'),
           ),
         ],
@@ -144,46 +131,40 @@ class CitaDetailScreen extends StatelessWidget {
   }
 }
 
-class _DetailRow extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String value;
-
-  const _DetailRow({
-    required this.icon,
-    required this.title,
-    required this.value,
-  });
+class _InfoSection extends StatelessWidget {
+  final List<Widget> children;
+  const _InfoSection({required this.children});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.blue, size: 28),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 4),
-                  Text(value,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    return Container(
+      decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.divider)),
+      child: Column(children: children.asMap().entries.map((e) => Column(children: [e.value, if (e.key < children.length - 1) Divider(height: 1, indent: 56, color: AppColors.divider)]) ).toList()),
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String value;
+
+  const _DetailRow({required this.icon, required this.color, required this.title, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)), child: Icon(icon, color: color, size: 18)),
+        const SizedBox(width: 14),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title, style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+          const SizedBox(height: 4),
+          Text(value, style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+        ])),
+      ]),
     );
   }
 }

@@ -104,8 +104,11 @@ class Cita {
   }
 
   String get horaFormato {
-    final h = fecha.hour.toString().padLeft(2, '0');
-    final m = fecha.minute.toString().padLeft(2, '0');
-    return '$h:$m';
+    int hour = fecha.hour;
+    final minute = fecha.minute.toString().padLeft(2, '0');
+    final period = hour >= 12 ? 'PM' : 'AM';
+    if (hour == 0) hour = 12;
+    else if (hour > 12) hour -= 12;
+    return '$hour:$minute $period';
   }
 }

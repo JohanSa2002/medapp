@@ -32,7 +32,7 @@ class NotificationProvider extends ChangeNotifier {
       await _service.scheduleNotification(
         id: id,
         title: 'Medicamento: $nombre',
-        body: 'Dosis: $dosis a las $hora',
+        body: 'Dosis: $dosis a las ${_toAmPm(hora)}',
         hora: hora,
         payload: medicamentoId,
       );
@@ -105,5 +105,16 @@ class NotificationProvider extends ChangeNotifier {
 
   int _notificationId(String medicamentoId, String hora) {
     return '${medicamentoId}_$hora'.hashCode.abs() % 2147483647;
+  }
+
+  // Convierte "HH:MM" a "h:mm AM/PM"
+  String _toAmPm(String hhmm) {
+    final parts = hhmm.split(':');
+    int hour = int.parse(parts[0]);
+    final minute = parts[1];
+    final period = hour >= 12 ? 'PM' : 'AM';
+    if (hour == 0) hour = 12;
+    else if (hour > 12) hour -= 12;
+    return '$hour:$minute $period';
   }
 }

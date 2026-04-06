@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'firebase_options.dart';
 import 'services/auth_service.dart';
 import 'providers/medicamento_provider.dart';
@@ -16,6 +18,7 @@ import 'screens/splash/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('es', null);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -46,19 +49,23 @@ class AppColors {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final List<SingleChildWidget>? providers;
+
+  const MyApp({super.key, this.providers});
 
   @override
   Widget build(BuildContext context) {
+    final provs = providers ?? [
+      Provider<AuthService>(create: (_) => AuthService()),
+      ChangeNotifierProvider(create: (_) => MedicamentoProvider()),
+      ChangeNotifierProvider(create: (_) => CitaProvider()),
+      ChangeNotifierProvider(create: (_) => RegistroProvider()),
+      ChangeNotifierProvider(create: (_) => ReporteProvider()),
+      ChangeNotifierProvider(create: (_) => NotificationProvider()),
+    ];
+
     return MultiProvider(
-      providers: [
-        Provider<AuthService>(create: (_) => AuthService()),
-        ChangeNotifierProvider(create: (_) => MedicamentoProvider()),
-        ChangeNotifierProvider(create: (_) => CitaProvider()),
-        ChangeNotifierProvider(create: (_) => RegistroProvider()),
-        ChangeNotifierProvider(create: (_) => ReporteProvider()),
-        ChangeNotifierProvider(create: (_) => NotificationProvider()),
-      ],
+      providers: provs,
       child: MaterialApp(
         title: 'MedApp',
         debugShowCheckedModeBanner: false,

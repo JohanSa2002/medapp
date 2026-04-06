@@ -10,6 +10,7 @@ import '../medicamentos/medicamentos_list_screen.dart';
 import '../citas/citas_list_screen.dart';
 import '../registro/registro_data_screen.dart';
 import '../reportes/reportes_screen.dart';
+import '../perfil/perfil_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,6 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
     if (hour < 12) return 'Buenos días';
     if (hour < 18) return 'Buenas tardes';
     return 'Buenas noches';
+  }
+
+  String _initials(String name) {
+    final parts = name.trim().split(' ').where((p) => p.isNotEmpty).toList();
+    if (parts.isEmpty) return '?';
+    if (parts.length == 1) return parts[0][0].toUpperCase();
+    return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
   }
 
   @override
@@ -82,20 +90,28 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-                      Row(
-                        children: [
-                          _HeaderIconBtn(
-                            icon: Icons.notifications_outlined,
-                            onTap: () => context
-                                .read<NotificationProvider>()
-                                .showTestNotification(),
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const PerfilScreen()),
+                        ),
+                        child: Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.25),
+                            borderRadius: BorderRadius.circular(14),
                           ),
-                          const SizedBox(width: 8),
-                          _HeaderIconBtn(
-                            icon: Icons.logout_rounded,
-                            onTap: () => context.read<AuthService>().logout(),
+                          child: Center(
+                            child: Text(
+                              _initials(displayName),
+                              style: GoogleFonts.inter(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
-                        ],
+                        ),
                       ),
                     ],
                   ),

@@ -176,6 +176,16 @@ class _MedicamentoCard extends StatelessWidget {
     required this.onDelete,
   });
 
+  String _toAmPm(String hhmm) {
+    final parts = hhmm.split(':');
+    int hour = int.parse(parts[0]);
+    final minute = parts[1];
+    final period = hour >= 12 ? 'PM' : 'AM';
+    if (hour == 0) hour = 12;
+    else if (hour > 12) hour -= 12;
+    return '$hour:$minute $period';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -271,7 +281,7 @@ class _MedicamentoCard extends StatelessWidget {
                                             size: 12, color: AppColors.primary),
                                         const SizedBox(width: 4),
                                         Text(
-                                          h,
+                                          _toAmPm(h),
                                           style: GoogleFonts.inter(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600,
