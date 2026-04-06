@@ -15,7 +15,7 @@ class CitaService {
     String? lugar,
     String? telefono,
     String? notas,
-    int minutosAntes = 60,
+    int minutosAntes = 1440,
   }) async {
     final cita = Cita(
       id: const Uuid().v4(),
@@ -60,7 +60,7 @@ class CitaService {
     String? lugar,
     String? telefono,
     String? notas,
-    int minutosAntes = 60,
+    int minutosAntes = 1440,
   }) async {
     final db = await _dbService.database;
     await db.update(

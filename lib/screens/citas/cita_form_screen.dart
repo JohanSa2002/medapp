@@ -24,7 +24,7 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
 
   late DateTime _fechaSeleccionada;
   late TimeOfDay _horaSeleccionada;
-  int _minutosAntes = 60;
+  int _minutosAntes = 1440;
   bool _isLoading = false;
 
   bool get _isEditing => widget.cita != null;
@@ -265,10 +265,10 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
               const SizedBox(height: 12),
               SegmentedButton<int>(
                 segments: const [
-                  ButtonSegment(value: 15, label: Text('15 min')),
                   ButtonSegment(value: 30, label: Text('30 min')),
                   ButtonSegment(value: 60, label: Text('1 hora')),
                   ButtonSegment(value: 120, label: Text('2 horas')),
+                  ButtonSegment(value: 1440, label: Text('1 día')),
                 ],
                 selected: {_minutosAntes},
                 onSelectionChanged: (s) =>

@@ -22,7 +22,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -33,6 +33,8 @@ class DatabaseService {
       CREATE TABLE users (
         id TEXT PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
+        nombre TEXT,
+        apellido TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     ''');
@@ -129,6 +131,14 @@ class DatabaseService {
         CREATE INDEX idx_registros_user_tipo
         ON registros(user_id, tipo, fecha)
       ''');
+    }
+    if (oldVersion < 4) {
+      try {
+        await db.execute('ALTER TABLE users ADD COLUMN nombre TEXT');
+      } catch (_) {}
+      try {
+        await db.execute('ALTER TABLE users ADD COLUMN apellido TEXT');
+      } catch (_) {}
     }
   }
 

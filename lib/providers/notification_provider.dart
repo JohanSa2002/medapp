@@ -74,9 +74,11 @@ class NotificationProvider extends ChangeNotifier {
     }
 
     final id = citaId.hashCode.abs() % 2147483647;
-    final tiempoTexto = minutosAntes >= 60
-        ? '${minutosAntes ~/ 60} hora(s)'
-        : '$minutosAntes minutos';
+    final tiempoTexto = minutosAntes >= 1440
+        ? '${minutosAntes ~/ 1440} día(s)'
+        : minutosAntes >= 60
+            ? '${minutosAntes ~/ 60} hora(s)'
+            : '$minutosAntes minutos';
 
     await _service.scheduleOneTimeNotification(
       id: id,

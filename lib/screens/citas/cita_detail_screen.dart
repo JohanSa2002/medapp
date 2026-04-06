@@ -84,9 +84,11 @@ class CitaDetailScreen extends StatelessWidget {
             _DetailRow(
               icon: Icons.notifications,
               title: 'Recordatorio',
-              value: cita.minutosAntes >= 60
-                  ? '${cita.minutosAntes ~/ 60} hora(s) antes'
-                  : '${cita.minutosAntes} minutos antes',
+              value: cita.minutosAntes >= 1440
+                  ? '${cita.minutosAntes ~/ 1440} día(s) antes'
+                  : cita.minutosAntes >= 60
+                      ? '${cita.minutosAntes ~/ 60} hora(s) antes'
+                      : '${cita.minutosAntes} minutos antes',
             ),
             if (cita.notas != null && cita.notas!.isNotEmpty)
               _DetailRow(

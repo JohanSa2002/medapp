@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import '../../main.dart';
 import '../../services/auth_service.dart';
 import '../../providers/cita_provider.dart';
 import '../../providers/notification_provider.dart';
@@ -23,185 +26,337 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<CitaProvider>().loadCitas(userId);
   }
 
+  String _greeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Buenos días';
+    if (hour < 18) return 'Buenas tardes';
+    return 'Buenas noches';
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = context.read<AuthService>().getCurrentUser();
+    final displayName = user?.displayName ?? user?.email ?? '';
+    final firstName = displayName.split(' ').first;
+    final today = DateFormat('EEEE, d \'de\' MMMM', 'es').format(DateTime.now());
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Medical Reminders'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => context.read<AuthService>().logout(),
+      body: CustomScrollView(
+        slivers: [
+          // ─── Header ──────────────────────────────────────────────────────
+          SliverToBoxAdapter(
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(24, 56, 24, 28),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF4A7AE0), Color(0xFF5B8DEF), Color(0xFF6FA0F5)],
+                ),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${_greeting()}, $firstName',
+                            style: GoogleFonts.inter(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            today,
+                            style: GoogleFonts.inter(
+                              fontSize: 13,
+                              color: Colors.white.withOpacity(0.8),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          _HeaderIconBtn(
+                            icon: Icons.notifications_outlined,
+                            onTap: () => context
+                                .read<NotificationProvider>()
+                                .showTestNotification(),
+                          ),
+                          const SizedBox(width: 8),
+                          _HeaderIconBtn(
+                            icon: Icons.logout_rounded,
+                            onTap: () => context.read<AuthService>().logout(),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+
+                // ─── Próxima cita ─────────────────────────────────────────
+                Consumer<CitaProvider>(
+                  builder: (context, provider, _) {
+                    final proxima = provider.proximaCita;
+                    if (proxima == null) return const SizedBox.shrink();
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionTitle('Próxima cita'),
+                        const SizedBox(height: 12),
+                        _CitaCard(proxima: proxima),
+                        const SizedBox(height: 24),
+                      ],
+                    );
+                  },
+                ),
+
+                // ─── Menú principal ───────────────────────────────────────
+                _SectionTitle('¿Qué deseas hacer?'),
+                const SizedBox(height: 12),
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.05,
+                  children: [
+                    _MenuTile(
+                      icon: Icons.medication_rounded,
+                      label: 'Medicamentos',
+                      subtitle: 'Horarios y dosis',
+                      color: AppColors.primary,
+                      bgColor: AppColors.primaryLight,
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => const MedicamentosListScreen(),
+                      )),
+                    ),
+                    _MenuTile(
+                      icon: Icons.calendar_month_rounded,
+                      label: 'Citas médicas',
+                      subtitle: 'Agenda y recordatorios',
+                      color: AppColors.warning,
+                      bgColor: AppColors.warningLight,
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => const CitasListScreen(),
+                      )),
+                    ),
+                    _MenuTile(
+                      icon: Icons.show_chart_rounded,
+                      label: 'Mis registros',
+                      subtitle: 'Glucosa, peso y más',
+                      color: AppColors.secondary,
+                      bgColor: AppColors.secondaryLight,
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => const RegistroDataScreen(),
+                      )),
+                    ),
+                    _MenuTile(
+                      icon: Icons.assessment_rounded,
+                      label: 'Reportes',
+                      subtitle: 'PDF, CSV y estadísticas',
+                      color: const Color(0xFF9B7EDE),
+                      bgColor: const Color(0xFFF0EBFF),
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => const ReportesScreen(),
+                      )),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 32),
+              ]),
+            ),
           ),
         ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text('Bienvenido',
-                style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: 4),
-            Text(user?.email ?? '',
-                style: TextStyle(color: Colors.grey[600])),
-            const SizedBox(height: 24),
-
-            // Próxima cita
-            Consumer<CitaProvider>(
-              builder: (context, provider, _) {
-                final proxima = provider.proximaCita;
-                if (proxima == null) return const SizedBox.shrink();
-                return Column(
-                  children: [
-                    Card(
-                      color: Colors.blue[50],
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.calendar_today,
-                                    color: Colors.blue, size: 22),
-                                const SizedBox(width: 8),
-                                Text('Próxima Cita',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(color: Colors.blue)),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              proxima.doctor,
-                              style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${proxima.especialidad} • ${proxima.fechaFormato} a las ${proxima.horaFormato}',
-                              style: TextStyle(
-                                  fontSize: 15, color: Colors.grey[700]),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              proxima.estado,
-                              style: TextStyle(
-                                color: proxima.esHoy
-                                    ? Colors.orange
-                                    : Colors.blue,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                );
-              },
-            ),
-
-            _MenuCard(
-              icon: Icons.medication,
-              title: 'Medicamentos',
-              subtitle: 'Gestiona tus medicamentos y horarios',
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const MedicamentosListScreen(),
-              )),
-            ),
-            const SizedBox(height: 16),
-            _MenuCard(
-              icon: Icons.calendar_today,
-              title: 'Citas Médicas',
-              subtitle: 'Agenda y gestiona tus citas',
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const CitasListScreen(),
-              )),
-            ),
-            const SizedBox(height: 16),
-            _MenuCard(
-              icon: Icons.show_chart,
-              title: 'Registro de Datos',
-              subtitle: 'Glucosa, peso y más',
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const RegistroDataScreen(),
-              )),
-            ),
-            const SizedBox(height: 16),
-            _MenuCard(
-              icon: Icons.assessment,
-              title: 'Reportes',
-              subtitle: 'PDF, CSV y estadísticas',
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const ReportesScreen(),
-              )),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: () =>
-                  context.read<NotificationProvider>().showTestNotification(),
-              icon: const Icon(Icons.notifications),
-              label: const Text('Probar Notificación'),
-              style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14)),
-            ),
-          ],
-        ),
       ),
     );
   }
 }
 
-class _MenuCard extends StatelessWidget {
+// ─── Widgets auxiliares ───────────────────────────────────────────────────────
+
+class _HeaderIconBtn extends StatelessWidget {
   final IconData icon;
-  final String title;
+  final VoidCallback onTap;
+  const _HeaderIconBtn({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String text;
+  const _SectionTitle(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: GoogleFonts.inter(
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+      ),
+    );
+  }
+}
+
+class _CitaCard extends StatelessWidget {
+  final dynamic proxima;
+  const _CitaCard({required this.proxima});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFF4E0), Color(0xFFFFF8EC)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.warning.withOpacity(0.25)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppColors.warning.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(Icons.calendar_today_rounded, color: AppColors.warning, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  proxima.doctor,
+                  style: GoogleFonts.inter(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  proxima.especialidad,
+                  style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${proxima.fechaFormato} · ${proxima.horaFormato}',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.warning,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MenuTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
   final String subtitle;
+  final Color color;
+  final Color bgColor;
   final VoidCallback onTap;
 
-  const _MenuCard({
+  const _MenuTile({
     required this.icon,
-    required this.title,
+    required this.label,
     required this.subtitle,
+    required this.color,
+    required this.bgColor,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      borderRadius: BorderRadius.circular(12),
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey[300]!),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.divider),
           ),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, size: 48, color: Colors.blue),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title,
-                        style: Theme.of(context).textTheme.titleLarge),
-                    const SizedBox(height: 4),
-                    Text(subtitle,
-                        style: TextStyle(color: Colors.grey[600])),
-                  ],
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: color, size: 24),
+              ),
+              const Spacer(),
+              Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
                 ),
               ),
-              Icon(Icons.arrow_forward_ios, color: Colors.grey[400]),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
         ),

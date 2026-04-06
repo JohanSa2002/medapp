@@ -19,7 +19,7 @@ class Cita {
     this.lugar,
     this.telefono,
     this.notas,
-    this.minutosAntes = 60,
+    this.minutosAntes = 1440,
     required this.createdAt,
   });
 
@@ -48,7 +48,7 @@ class Cita {
       lugar: map['lugar'] as String?,
       telefono: map['telefono'] as String?,
       notas: map['notas'] as String?,
-      minutosAntes: map['minutos_antes'] as int? ?? 60,
+      minutosAntes: map['minutos_antes'] as int? ?? 1440,
       createdAt: DateTime.parse(map['created_at'] as String),
     );
   }

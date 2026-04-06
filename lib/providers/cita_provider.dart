@@ -45,7 +45,7 @@ class CitaProvider extends ChangeNotifier {
     String? lugar,
     String? telefono,
     String? notas,
-    int minutosAntes = 60,
+    int minutosAntes = 1440,
   }) async {
     await _service.addCita(
       userId: userId,
@@ -86,7 +86,7 @@ class CitaProvider extends ChangeNotifier {
     String? lugar,
     String? telefono,
     String? notas,
-    int minutosAntes = 60,
+    int minutosAntes = 1440,
   }) async {
     // Cancelar recordatorio anterior
     await notificationProvider.cancelNotificationId(

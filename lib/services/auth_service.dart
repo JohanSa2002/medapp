@@ -9,16 +9,25 @@ class AuthService {
     return _firebaseAuth.authStateChanges();
   }
 
-  Future<void> register(String email, String password) async {
+  Future<void> register(
+    String email,
+    String password, {
+    required String nombre,
+    required String apellido,
+  }) async {
     final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
 
+    await userCredential.user!.updateDisplayName('$nombre $apellido');
+
     final db = await _dbService.database;
     await db.insert('users', {
       'id': userCredential.user!.uid,
       'email': email,
+      'nombre': nombre,
+      'apellido': apellido,
     });
   }
 

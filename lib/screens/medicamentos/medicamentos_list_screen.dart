@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../main.dart';
 import '../../models/medicamento.dart';
 import '../../providers/medicamento_provider.dart';
 import '../../providers/notification_provider.dart';
@@ -26,41 +28,34 @@ class _MedicamentosListScreenState extends State<MedicamentosListScreen> {
     final userId = context.read<AuthService>().getCurrentUser()!.uid;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis Medicamentos')),
+      appBar: AppBar(
+        title: const Text('Medicamentos'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _navigateToForm(context, userId),
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Agregar'),
+      ),
       body: Consumer<MedicamentoProvider>(
         builder: (context, provider, _) {
           if (provider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (provider.medicamentos.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.medication, size: 80, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No tienes medicamentos registrados',
-                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () => _navigateToForm(context, userId),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                    ),
-                    child: const Text('Agregar Medicamento'),
-                  ),
-                ],
-              ),
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
+          if (provider.medicamentos.isEmpty) {
+            return _EmptyState(onAdd: () => _navigateToForm(context, userId));
+          }
+
+          return ListView.separated(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
             itemCount: provider.medicamentos.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final med = provider.medicamentos[index];
               return _MedicamentoCard(
@@ -72,34 +67,27 @@ class _MedicamentosListScreenState extends State<MedicamentosListScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _navigateToForm(context, userId),
-        tooltip: 'Agregar medicamento',
-        child: const Icon(Icons.add),
-      ),
     );
   }
 
-  void _navigateToForm(BuildContext context, String userId,
-      {Medicamento? medicamento}) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => MedicamentoFormScreen(
-          userId: userId,
-          medicamento: medicamento,
-        ),
-      ),
-    );
+  void _navigateToForm(BuildContext context, String userId, {Medicamento? medicamento}) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => MedicamentoFormScreen(userId: userId, medicamento: medicamento),
+    ));
   }
 
-  void _showDeleteDialog(
-      BuildContext context, Medicamento medicamento, String userId) {
+  void _showDeleteDialog(BuildContext context, Medicamento medicamento, String userId) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Eliminar medicamento'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Eliminar medicamento',
+          style: GoogleFonts.inter(fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+        ),
         content: Text(
-          '¿Eliminar "${medicamento.nombre}"?\nSe cancelarán todas sus notificaciones.',
+          '¿Deseas eliminar "${medicamento.nombre}"?\nSe cancelarán todas sus notificaciones.',
+          style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
@@ -116,15 +104,62 @@ class _MedicamentosListScreenState extends State<MedicamentosListScreen> {
                     notificationProvider: notifProvider,
                   );
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Medicamento eliminado. Notificaciones canceladas'),
-                ),
+                const SnackBar(content: Text('Medicamento eliminado')),
               );
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('Eliminar'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  final VoidCallback onAdd;
+  const _EmptyState({required this.onAdd});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.primaryLight,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: const Icon(Icons.medication_rounded, size: 40, color: AppColors.primary),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Sin medicamentos',
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Agrega tus medicamentos para recibir recordatorios puntuales',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary, height: 1.5),
+            ),
+            const SizedBox(height: 28),
+            ElevatedButton.icon(
+              onPressed: onAdd,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Agregar medicamento'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -143,59 +178,176 @@ class _MedicamentoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              medicamento.nombre,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Dosis: ${medicamento.dosis}',
-              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              children: medicamento.horarios
-                  .map((h) => Chip(
-                        label: Text(h, style: const TextStyle(fontSize: 14)),
-                        backgroundColor: Colors.blue[100],
-                      ))
-                  .toList(),
-            ),
-            if (medicamento.notas != null && medicamento.notas!.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  'Notas: ${medicamento.notas}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                    fontStyle: FontStyle.italic,
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.divider),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.05),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Accent bar + contenido
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Barra de color izquierda
+                Container(
+                  width: 4,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
+                    ),
                   ),
                 ),
-              ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(onPressed: onEdit, child: const Text('Editar')),
-                TextButton(
-                  onPressed: onDelete,
-                  style: TextButton.styleFrom(foregroundColor: Colors.red),
-                  child: const Text('Eliminar'),
+                // Contenido
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryLight,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(Icons.medication_rounded,
+                                  color: AppColors.primary, size: 20),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                medicamento.nombre,
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        _InfoRow(
+                          icon: Icons.scale_rounded,
+                          text: 'Dosis: ${medicamento.dosis}',
+                        ),
+                        if (medicamento.notas != null && medicamento.notas!.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          _InfoRow(
+                            icon: Icons.notes_rounded,
+                            text: medicamento.notas!,
+                          ),
+                        ],
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: medicamento.horarios
+                              .map((h) => Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primaryLight,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.access_time_rounded,
+                                            size: 12, color: AppColors.primary),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          h,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.primary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+
+          // Acciones
+          Container(
+            decoration: const BoxDecoration(
+              border: Border(top: BorderSide(color: AppColors.divider)),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextButton.icon(
+                    onPressed: onEdit,
+                    icon: const Icon(Icons.edit_outlined, size: 16),
+                    label: const Text('Editar'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                Container(width: 1, height: 36, color: AppColors.divider),
+                Expanded(
+                  child: TextButton.icon(
+                    onPressed: onDelete,
+                    icon: const Icon(Icons.delete_outline_rounded, size: 16),
+                    label: const Text('Eliminar'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.error,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  const _InfoRow({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: AppColors.textSecondary),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            text,
+            style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary),
+          ),
+        ),
+      ],
     );
   }
 }
