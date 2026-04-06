@@ -99,8 +99,11 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
     int hour = int.parse(parts[0]);
     final minute = parts[1];
     final period = hour >= 12 ? 'PM' : 'AM';
-    if (hour == 0) hour = 12;
-    else if (hour > 12) hour -= 12;
+    if (hour == 0) {
+      hour = 12;
+    } else if (hour > 12) {
+      hour -= 12;
+    }
     return '$hour:$minute $period';
   }
 
@@ -204,7 +207,7 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _Label('Nombre del medicamento'),
+              const _Label('Nombre del medicamento'),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _nombreController,
@@ -216,7 +219,7 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
                     (v == null || v.isEmpty) ? 'El nombre es requerido' : null,
               ),
               const SizedBox(height: 16),
-              _Label('Dosis'),
+              const _Label('Dosis'),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _dosisController,
@@ -230,7 +233,7 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
               const SizedBox(height: 20),
 
               // ─── Horarios ────────────────────────────────────────────────
-              _Label('Horarios de consumo'),
+              const _Label('Horarios de consumo'),
               const SizedBox(height: 4),
               Text(
                 'Formato: h:mm AM/PM  (ej: 8:00 AM, 2:30 PM, 9:00 PM)',
@@ -305,7 +308,7 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
               ],
 
               const SizedBox(height: 20),
-              _Label('Notas (opcional)'),
+              const _Label('Notas (opcional)'),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _notasController,
@@ -387,7 +390,7 @@ class _HorarioChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.primaryLight,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+        border: Border.all(color: AppColors.primary.withAlpha(51)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: Row(

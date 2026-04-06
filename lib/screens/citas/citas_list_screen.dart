@@ -139,7 +139,7 @@ class _EmptyState extends StatelessWidget {
               width: 92,
               height: 92,
               decoration: BoxDecoration(color: AppColors.primaryLight, borderRadius: BorderRadius.circular(20)),
-              child: Icon(Icons.calendar_month_rounded, size: 44, color: AppColors.primary),
+              child: const Icon(Icons.calendar_month_rounded, size: 44, color: AppColors.primary),
             ),
             const SizedBox(height: 20),
             Text('Sin citas', style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),

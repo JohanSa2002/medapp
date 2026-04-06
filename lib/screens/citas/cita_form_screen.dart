@@ -105,8 +105,11 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
     int hour = t.hour;
     final minute = t.minute.toString().padLeft(2, '0');
     final period = hour >= 12 ? 'PM' : 'AM';
-    if (hour == 0) hour = 12;
-    else if (hour > 12) hour -= 12;
+    if (hour == 0) {
+      hour = 12;
+    } else if (hour > 12) {
+      hour -= 12;
+    }
     return '$hour:$minute $period';
   }
 
@@ -205,7 +208,7 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _Label('Doctor'),
+              const _Label('Doctor'),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _doctorController,
@@ -217,7 +220,7 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
                     (v == null || v.isEmpty) ? 'El nombre del doctor es requerido' : null,
               ),
               const SizedBox(height: 16),
-              _Label('Especialidad'),
+              const _Label('Especialidad'),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _especialidadController,
@@ -229,7 +232,7 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
                     (v == null || v.isEmpty) ? 'La especialidad es requerida' : null,
               ),
               const SizedBox(height: 16),
-              _Label('Fecha'),
+              const _Label('Fecha'),
               const SizedBox(height: 6),
               InkWell(
                 onTap: _selectFecha,
@@ -258,7 +261,7 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              _Label('Hora'),
+              const _Label('Hora'),
               const SizedBox(height: 4),
               Text(
                 'Formato: h:mm AM/PM  (ej: 10:00 AM, 3:30 PM)',
@@ -275,7 +278,7 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
                 keyboardType: TextInputType.datetime,
               ),
               const SizedBox(height: 16),
-              _Label('Lugar (opcional)'),
+              const _Label('Lugar (opcional)'),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _lugarController,
@@ -285,7 +288,7 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              _Label('Teléfono (opcional)'),
+              const _Label('Teléfono (opcional)'),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _telefonoController,
@@ -296,7 +299,7 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
                 keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 16),
-              _Label('Notas (opcional)'),
+              const _Label('Notas (opcional)'),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _notasController,

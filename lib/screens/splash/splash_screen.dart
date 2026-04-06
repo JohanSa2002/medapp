@@ -28,7 +28,7 @@ class SplashScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(28),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.3),
+                      color: AppColors.primary.withAlpha(77),
                       blurRadius: 24,
                       offset: const Offset(0, 8),
                     ),
@@ -65,7 +65,7 @@ class SplashScreen extends StatelessWidget {
                 height: 28,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
-                  color: AppColors.primary.withOpacity(0.6),
+                  color: AppColors.primary.withAlpha(153),
                 ),
               ),
             ],

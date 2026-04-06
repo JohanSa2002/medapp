@@ -76,7 +76,7 @@ class MyApp extends StatelessWidget {
   }
 
   ThemeData _buildTheme() {
-    final base = ColorScheme.light(
+    const base = ColorScheme.light(
       primary: AppColors.primary,
       primaryContainer: AppColors.primaryLight,
       secondary: AppColors.secondary,

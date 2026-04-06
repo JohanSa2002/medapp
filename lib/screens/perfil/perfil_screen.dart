@@ -69,10 +69,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
   }
 
   void _showChangePasswordDialog() {
-    final currentController = TextEditingController();
     final newController = TextEditingController();
     final confirmController = TextEditingController();
-    bool obscureCurrent = true;
     bool obscureNew = true;
     bool obscureConfirm = true;
     bool isLoading = false;
@@ -230,7 +228,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                               borderRadius: BorderRadius.circular(28),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.25),
+                                  color: AppColors.primary.withAlpha(64),
                                   blurRadius: 16,
                                   offset: const Offset(0, 6),
                                 ),
@@ -261,9 +259,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     const SizedBox(height: 32),
 
                     // Sección datos personales
-                    _SectionHeader('Datos personales'),
+                    const _SectionHeader('Datos personales'),
                     const SizedBox(height: 12),
-                    _FieldLabel('Nombre'),
+                    const _FieldLabel('Nombre'),
                     const SizedBox(height: 6),
                     TextFormField(
                       controller: _nombreController,
@@ -276,7 +274,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           (v == null || v.trim().isEmpty) ? 'El nombre es requerido' : null,
                     ),
                     const SizedBox(height: 16),
-                    _FieldLabel('Apellido'),
+                    const _FieldLabel('Apellido'),
                     const SizedBox(height: 6),
                     TextFormField(
                       controller: _apellidoController,
@@ -289,7 +287,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           (v == null || v.trim().isEmpty) ? 'El apellido es requerido' : null,
                     ),
                     const SizedBox(height: 16),
-                    _FieldLabel('Correo electrónico'),
+                    const _FieldLabel('Correo electrónico'),
                     const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -333,7 +331,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     const SizedBox(height: 32),
 
                     // Sección seguridad
-                    _SectionHeader('Seguridad'),
+                    const _SectionHeader('Seguridad'),
                     const SizedBox(height: 12),
                     _ActionTile(
                       icon: Icons.lock_reset_rounded,
@@ -345,7 +343,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     const SizedBox(height: 32),
 
                     // Sección cuenta
-                    _SectionHeader('Cuenta'),
+                    const _SectionHeader('Cuenta'),
                     const SizedBox(height: 12),
                     _ActionTile(
                       icon: Icons.logout_rounded,
@@ -460,7 +458,7 @@ class _ActionTile extends StatelessWidget {
                   ),
                 ),
               ),
-              Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textSecondary),
+              const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textSecondary),
             ],
           ),
         ),

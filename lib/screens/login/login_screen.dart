@@ -94,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.25),
+                        color: AppColors.primary.withAlpha(64),
                         blurRadius: 20,
                         offset: const Offset(0, 6),
                       ),
@@ -132,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.06),
+                        color: AppColors.primary.withAlpha(15),
                         blurRadius: 24,
                         offset: const Offset(0, 8),
                       ),
@@ -145,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         // Campos nombre/apellido solo en registro
                         if (!_isLogin) ...[
-                          _Label('Nombre'),
+                          const _Label('Nombre'),
                           const SizedBox(height: 6),
                           TextFormField(
                             controller: _nombreController,
@@ -159,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 : null,
                           ),
                           const SizedBox(height: 16),
-                          _Label('Apellido'),
+                          const _Label('Apellido'),
                           const SizedBox(height: 6),
                           TextFormField(
                             controller: _apellidoController,
@@ -175,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 16),
                         ],
 
-                        _Label('Correo electrónico'),
+                        const _Label('Correo electrónico'),
                         const SizedBox(height: 6),
                         TextFormField(
                           controller: _emailController,
@@ -188,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           autocorrect: false,
                         ),
                         const SizedBox(height: 16),
-                        _Label('Contraseña'),
+                        const _Label('Contraseña'),
                         const SizedBox(height: 6),
                         TextFormField(
                           controller: _passwordController,

@@ -71,7 +71,7 @@ class CitaDetailScreen extends StatelessWidget {
           _InfoSection(children: [
             _DetailRow(icon: Icons.calendar_today_rounded, color: AppColors.warning, title: 'Fecha', value: cita.fechaFormato),
             _DetailRow(icon: Icons.schedule_rounded, color: AppColors.primary, title: 'Hora', value: cita.horaFormato),
-            _DetailRow(icon: Icons.notifications_rounded, color: AppColors.secondary, title: 'Recordatorio', value: '1 día antes'),
+            const _DetailRow(icon: Icons.notifications_rounded, color: AppColors.secondary, title: 'Recordatorio', value: '1 día antes'),
           ]),
 
           if ((cita.lugar != null && cita.lugar!.isNotEmpty) || (cita.telefono != null && cita.telefono!.isNotEmpty)) ...[
@@ -95,7 +95,7 @@ class CitaDetailScreen extends StatelessWidget {
                 onPressed: () => _showDeleteDialog(context),
                 icon: const Icon(Icons.delete_outline_rounded, size: 20),
                 label: Text('Eliminar cita', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-                style: OutlinedButton.styleFrom(foregroundColor: AppColors.error, side: BorderSide(color: AppColors.error.withOpacity(0.3)), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                style: OutlinedButton.styleFrom(foregroundColor: AppColors.error, side: BorderSide(color: AppColors.error.withAlpha(77)), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
               ),
             ),
           ],
@@ -139,7 +139,7 @@ class _InfoSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.divider)),
-      child: Column(children: children.asMap().entries.map((e) => Column(children: [e.value, if (e.key < children.length - 1) Divider(height: 1, indent: 56, color: AppColors.divider)]) ).toList()),
+      child: Column(children: children.asMap().entries.map((e) => Column(mainAxisSize: MainAxisSize.min, children: [e.value, if (e.key < children.length - 1) const Divider(height: 1, indent: 56, color: AppColors.divider)]) ).toList()),
     );
   }
 }
@@ -157,7 +157,7 @@ class _DetailRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withOpacity(0.12), borderRadius: BorderRadius.circular(8)), child: Icon(icon, color: color, size: 18)),
+        Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withAlpha(31), borderRadius: BorderRadius.circular(8)), child: Icon(icon, color: color, size: 18)),
         const SizedBox(width: 14),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title, style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),

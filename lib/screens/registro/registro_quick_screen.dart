@@ -94,8 +94,11 @@ class _RegistroQuickScreenState extends State<RegistroQuickScreen> {
     int hour = t.hour;
     final minute = t.minute.toString().padLeft(2, '0');
     final period = hour >= 12 ? 'PM' : 'AM';
-    if (hour == 0) hour = 12;
-    else if (hour > 12) hour -= 12;
+    if (hour == 0) {
+      hour = 12;
+    } else if (hour > 12) {
+      hour -= 12;
+    }
     return '$hour:$minute $period';
   }
 
@@ -233,7 +236,7 @@ class _RegistroQuickScreenState extends State<RegistroQuickScreen> {
               const SizedBox(height: 20),
 
               // Fecha
-              _Label('Fecha'),
+              const _Label('Fecha'),
               const SizedBox(height: 6),
               InkWell(
                 onTap: _selectFecha,
@@ -268,7 +271,7 @@ class _RegistroQuickScreenState extends State<RegistroQuickScreen> {
               const SizedBox(height: 20),
 
               // Hora — mismo patrón que medicamentos
-              _Label('Hora'),
+              const _Label('Hora'),
               const SizedBox(height: 4),
               Text(
                 'Formato: h:mm AM/PM  (ej: 8:30 AM, 2:00 PM)',
@@ -288,7 +291,7 @@ class _RegistroQuickScreenState extends State<RegistroQuickScreen> {
               const SizedBox(height: 20),
 
               // Notas
-              _Label('Notas (opcional)'),
+              const _Label('Notas (opcional)'),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _notasController,

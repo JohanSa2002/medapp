@@ -181,8 +181,11 @@ class _MedicamentoCard extends StatelessWidget {
     int hour = int.parse(parts[0]);
     final minute = parts[1];
     final period = hour >= 12 ? 'PM' : 'AM';
-    if (hour == 0) hour = 12;
-    else if (hour > 12) hour -= 12;
+    if (hour == 0) {
+      hour = 12;
+    } else if (hour > 12) {
+      hour -= 12;
+    }
     return '$hour:$minute $period';
   }
 
@@ -195,7 +198,7 @@ class _MedicamentoCard extends StatelessWidget {
         border: Border.all(color: AppColors.divider),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.05),
+            color: AppColors.primary.withAlpha(13),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),

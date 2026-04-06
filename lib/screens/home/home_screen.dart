@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import '../../main.dart';
 import '../../services/auth_service.dart';
 import '../../providers/cita_provider.dart';
-import '../../providers/notification_provider.dart';
 import '../medicamentos/medicamentos_list_screen.dart';
 import '../citas/citas_list_screen.dart';
 import '../registro/registro_data_screen.dart';
@@ -85,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             today,
                             style: GoogleFonts.inter(
                               fontSize: 13,
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withAlpha(204),
                             ),
                           ),
                         ],
@@ -98,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: 42,
                           height: 42,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.25),
+                            color: Colors.white.withAlpha(64),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Center(
@@ -133,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _SectionTitle('Próxima cita'),
+                        const _SectionTitle('Próxima cita'),
                         const SizedBox(height: 12),
                         _CitaCard(proxima: proxima),
                         const SizedBox(height: 24),
@@ -143,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 // ─── Menú principal ───────────────────────────────────────
-                _SectionTitle('¿Qué deseas hacer?'),
+                const _SectionTitle('¿Qué deseas hacer?'),
                 const SizedBox(height: 12),
                 GridView.count(
                   crossAxisCount: 2,
@@ -206,29 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ─── Widgets auxiliares ───────────────────────────────────────────────────────
 
-class _HeaderIconBtn extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  const _HeaderIconBtn({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(icon, color: Colors.white, size: 20),
-      ),
-    );
-  }
-}
 
 class _SectionTitle extends StatelessWidget {
   final String text;
@@ -262,7 +239,7 @@ class _CitaCard extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.warning.withOpacity(0.25)),
+        border: Border.all(color: AppColors.warning.withAlpha(64)),
       ),
       child: Row(
         children: [
@@ -270,7 +247,7 @@ class _CitaCard extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: AppColors.warning.withOpacity(0.15),
+              color: AppColors.warning.withAlpha(38),
               borderRadius: BorderRadius.circular(14),
             ),
             child: const Icon(Icons.calendar_today_rounded, color: AppColors.warning, size: 24),

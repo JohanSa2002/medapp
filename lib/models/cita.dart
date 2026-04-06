@@ -107,8 +107,11 @@ class Cita {
     int hour = fecha.hour;
     final minute = fecha.minute.toString().padLeft(2, '0');
     final period = hour >= 12 ? 'PM' : 'AM';
-    if (hour == 0) hour = 12;
-    else if (hour > 12) hour -= 12;
+    if (hour == 0) {
+      hour = 12;
+    } else if (hour > 12) {
+      hour -= 12;
+    }
     return '$hour:$minute $period';
   }
 }
