@@ -3,7 +3,9 @@
     "allow": [
       "Bash(flutter doctor:*)",
       "Bash(\"/c/Users/2002s/Documents/flutter_windows_3.41.6-stable/flutter/bin/flutter\" pub:*)",
-      "Bash(\"C:/Users/2002s/Documents/flutter_windows_3.41.6-stable/flutter/bin/flutter.bat\" analyze:*)"
+      "Bash(\"C:/Users/2002s/Documents/flutter_windows_3.41.6-stable/flutter/bin/flutter.bat\" analyze:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter devices:*)"
     ]
   }
 }

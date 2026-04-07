@@ -281,12 +281,23 @@ class _RegistroQuickScreenState extends State<RegistroQuickScreen> {
               const SizedBox(height: 6),
               TextFormField(
                 controller: _horaController,
+                readOnly: true,
+                onTap: () async {
+                  final picked = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                  if (picked != null) {
+                    setState(() {
+                      _horaController.text = _timeOfDayToAmPm(picked);
+                    });
+                  }
+                },
                 decoration: InputDecoration(
-                  hintText: 'ej: 8:30 AM',
+                  hintText: 'Toca para seleccionar hora',
                   prefixIcon: const Icon(Icons.schedule_rounded),
                   suffixIcon: _buildStatusIcon(),
                 ),
-                keyboardType: TextInputType.datetime,
               ),
               const SizedBox(height: 20),
 

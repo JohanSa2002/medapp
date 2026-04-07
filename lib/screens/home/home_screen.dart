@@ -59,7 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
           // ─── Header ──────────────────────────────────────────────────────
           SliverToBoxAdapter(
             child: Container(
-              padding: const EdgeInsets.fromLTRB(24, 56, 24, 28),
+              padding: EdgeInsets.fromLTRB(
+                  24, MediaQuery.of(context).padding.top + 20, 24, 28),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -169,13 +170,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ─── Menú principal ───────────────────────────────────────
                 const _SectionTitle('¿Qué deseas hacer?'),
                 const SizedBox(height: 12),
-                GridView.count(
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final ratio = constraints.maxWidth < 340 ? 0.85 : 0.92;
+                    return GridView.count(
                   crossAxisCount: 2,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   mainAxisSpacing: 14,
                   crossAxisSpacing: 14,
-                  childAspectRatio: 0.92,
+                  childAspectRatio: ratio,
                   children: [
                     _MenuTile(
                       icon: Icons.medication_rounded,
@@ -218,6 +222,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       )),
                     ),
                   ],
+                );
+                  },
                 ),
 
                 const SizedBox(height: 32),

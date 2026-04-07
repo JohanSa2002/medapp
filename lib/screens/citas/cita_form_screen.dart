@@ -26,7 +26,6 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
   final TextEditingController _horaController = TextEditingController();
 
   late DateTime _fechaSeleccionada;
-  _HoraStatus _horaStatus = _HoraStatus.empty;
   bool _isLoading = false;
 
   bool get _isEditing => widget.cita != null;
@@ -35,21 +34,21 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
   void initState() {
     super.initState();
     _doctorController = TextEditingController(text: widget.cita?.doctor ?? '');
-    _especialidadController = TextEditingController(text: widget.cita?.especialidad ?? '');
+    _especialidadController =
+        TextEditingController(text: widget.cita?.especialidad ?? '');
     _lugarController = TextEditingController(text: widget.cita?.lugar ?? '');
-    _telefonoController = TextEditingController(text: widget.cita?.telefono ?? '');
+    _telefonoController =
+        TextEditingController(text: widget.cita?.telefono ?? '');
     _notasController = TextEditingController(text: widget.cita?.notas ?? '');
 
     if (widget.cita != null) {
       _fechaSeleccionada = widget.cita!.fecha;
-      // Pre-llenar con la hora de la cita en AM/PM
-      _horaController.text = _timeToAmPm(TimeOfDay.fromDateTime(widget.cita!.fecha));
-      _horaStatus = _HoraStatus.valid;
+      final h = widget.cita!.fecha.hour.toString().padLeft(2, '0');
+      final m = widget.cita!.fecha.minute.toString().padLeft(2, '0');
+      _horaController.text = '$h:$m';
     } else {
       _fechaSeleccionada = DateTime.now().add(const Duration(days: 1));
     }
-
-    _horaController.addListener(_onHoraChanged);
   }
 
   @override
@@ -59,58 +58,29 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
     _lugarController.dispose();
     _telefonoController.dispose();
     _notasController.dispose();
-    _horaController.removeListener(_onHoraChanged);
     _horaController.dispose();
     super.dispose();
   }
 
-  void _onHoraChanged() {
-    final text = _horaController.text.trim();
-    if (text.isEmpty) {
-      setState(() => _horaStatus = _HoraStatus.empty);
-      return;
-    }
-    setState(() {
-      _horaStatus = _isValidHora(text) ? _HoraStatus.valid : _HoraStatus.invalid;
-    });
-  }
-
+  // Valida formato HH:MM
   bool _isValidHora(String text) {
-    final match = RegExp(r'^(\d{1,2}):(\d{2})\s*(AM|PM|am|pm)$').firstMatch(text.trim());
+    final match = RegExp(r'^(\d{1,2}):(\d{2})$').firstMatch(text.trim());
     if (match == null) return false;
     final hour = int.tryParse(match.group(1)!);
     final minute = int.tryParse(match.group(2)!);
     if (hour == null || minute == null) return false;
-    return hour >= 1 && hour <= 12 && minute >= 0 && minute <= 59;
+    return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59;
   }
 
   DateTime _parseHoraCompleta() {
-    final text = _horaController.text.trim();
-    final match = RegExp(r'^(\d{1,2}):(\d{2})\s*(AM|PM|am|pm)$').firstMatch(text)!;
-    int hour = int.parse(match.group(1)!);
-    final minute = int.parse(match.group(2)!);
-    final period = match.group(3)!.toUpperCase();
-    if (period == 'AM' && hour == 12) hour = 0;
-    if (period == 'PM' && hour != 12) hour += 12;
+    final parts = _horaController.text.trim().split(':');
     return DateTime(
       _fechaSeleccionada.year,
       _fechaSeleccionada.month,
       _fechaSeleccionada.day,
-      hour,
-      minute,
+      int.parse(parts[0]),
+      int.parse(parts[1]),
     );
-  }
-
-  String _timeToAmPm(TimeOfDay t) {
-    int hour = t.hour;
-    final minute = t.minute.toString().padLeft(2, '0');
-    final period = hour >= 12 ? 'PM' : 'AM';
-    if (hour == 0) {
-      hour = 12;
-    } else if (hour > 12) {
-      hour -= 12;
-    }
-    return '$hour:$minute $period';
   }
 
   Future<void> _selectFecha() async {
@@ -127,7 +97,8 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (!_isValidHora(_horaController.text.trim())) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ingresa una hora válida (ej: 10:00 AM)')),
+        const SnackBar(
+            content: Text('Ingresa una hora válida en formato HH:MM')),
       );
       return;
     }
@@ -138,9 +109,15 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
       final provider = context.read<CitaProvider>();
       final notifProvider = context.read<NotificationProvider>();
 
-      final lugar = _lugarController.text.trim().isEmpty ? null : _lugarController.text.trim();
-      final telefono = _telefonoController.text.trim().isEmpty ? null : _telefonoController.text.trim();
-      final notas = _notasController.text.trim().isEmpty ? null : _notasController.text.trim();
+      final lugar = _lugarController.text.trim().isEmpty
+          ? null
+          : _lugarController.text.trim();
+      final telefono = _telefonoController.text.trim().isEmpty
+          ? null
+          : _telefonoController.text.trim();
+      final notas = _notasController.text.trim().isEmpty
+          ? null
+          : _notasController.text.trim();
 
       if (_isEditing) {
         await provider.updateCita(
@@ -187,6 +164,17 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
     }
   }
 
+  String _toAmPm(String hhmm) {
+    final parts = hhmm.trim().split(':');
+    if (parts.length != 2) return '';
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null) return '';
+    final period = hour >= 12 ? 'PM' : 'AM';
+    int h = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+    return '$h:${minute.toString().padLeft(2, '0')} $period';
+  }
+
   String _formatDate(DateTime d) {
     return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
   }
@@ -216,8 +204,9 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
                   hintText: 'Ej: Dr. Juan Pérez',
                   prefixIcon: Icon(Icons.person_outline_rounded),
                 ),
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'El nombre del doctor es requerido' : null,
+                validator: (v) => (v == null || v.isEmpty)
+                    ? 'El nombre del doctor es requerido'
+                    : null,
               ),
               const SizedBox(height: 16),
               const _Label('Especialidad'),
@@ -228,8 +217,9 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
                   hintText: 'Ej: Cardiología, Pediatría',
                   prefixIcon: Icon(Icons.medical_services_outlined),
                 ),
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'La especialidad es requerida' : null,
+                validator: (v) => (v == null || v.isEmpty)
+                    ? 'La especialidad es requerida'
+                    : null,
               ),
               const SizedBox(height: 16),
               const _Label('Fecha'),
@@ -238,7 +228,8 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
                 onTap: _selectFecha,
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     border: Border.all(color: AppColors.divider),
@@ -251,7 +242,8 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
                       const SizedBox(width: 12),
                       Text(
                         _formatDate(_fechaSeleccionada),
-                        style: GoogleFonts.inter(fontSize: 15, color: AppColors.textPrimary),
+                        style: GoogleFonts.inter(
+                            fontSize: 15, color: AppColors.textPrimary),
                       ),
                       const Spacer(),
                       const Icon(Icons.arrow_forward_ios_rounded,
@@ -264,19 +256,49 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
               const _Label('Hora'),
               const SizedBox(height: 4),
               Text(
-                'Formato: h:mm AM/PM  (ej: 10:00 AM, 3:30 PM)',
-                style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary),
+                'Ingresa la hora en 24h: HH:MM (ej: 10:00, 15:30). Se mostrara en AM/PM.',
+                style: GoogleFonts.inter(
+                    fontSize: 13, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 6),
               TextFormField(
                 controller: _horaController,
-                decoration: InputDecoration(
-                  hintText: 'ej: 10:00 AM',
-                  prefixIcon: const Icon(Icons.schedule_rounded),
-                  suffixIcon: _buildStatusIcon(),
+                readOnly: true,
+                onTap: () async {
+                  final picked = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                  if (picked != null) {
+                    final h = picked.hour.toString().padLeft(2, '0');
+                    final m = picked.minute.toString().padLeft(2, '0');
+                    setState(() {
+                      _horaController.text = '$h:$m';
+                    });
+                  }
+                },
+                decoration: const InputDecoration(
+                  hintText: 'Toca para seleccionar hora',
+                  prefixIcon: Icon(Icons.schedule_rounded),
                 ),
-                keyboardType: TextInputType.datetime,
               ),
+              if (_isValidHora(_horaController.text)) ...[
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.check_circle_outline_rounded,
+                        size: 14, color: AppColors.secondary),
+                    const SizedBox(width: 6),
+                    Text(
+                      _toAmPm(_horaController.text),
+                      style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.secondary),
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 16),
               const _Label('Lugar (opcional)'),
               const SizedBox(height: 6),
@@ -328,21 +350,7 @@ class _CitaFormScreenState extends State<CitaFormScreen> {
       ),
     );
   }
-
-  Widget? _buildStatusIcon() {
-    switch (_horaStatus) {
-      case _HoraStatus.valid:
-        return const Icon(Icons.check_circle_rounded,
-            color: Color(0xFF52C4A0), size: 22);
-      case _HoraStatus.invalid:
-        return const Icon(Icons.cancel_rounded, color: AppColors.error, size: 22);
-      case _HoraStatus.empty:
-        return null;
-    }
-  }
 }
-
-enum _HoraStatus { empty, valid, invalid }
 
 class _Label extends StatelessWidget {
   final String text;

@@ -27,11 +27,8 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
   late final TextEditingController _notasController;
   final TextEditingController _horarioController = TextEditingController();
 
-  List<String> _horarios = []; // siempre en formato HH:MM internamente
+  List<String> _horarios = [];
   bool _isLoading = false;
-
-  // Estado del campo de horario
-  _HorarioStatus _horarioStatus = _HorarioStatus.empty;
 
   bool get _isEditing => widget.medicamento != null;
 
@@ -42,7 +39,6 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
     _dosisController = TextEditingController(text: widget.medicamento?.dosis ?? '');
     _notasController = TextEditingController(text: widget.medicamento?.notas ?? '');
     _horarios = List<String>.from(widget.medicamento?.horarios ?? []);
-    _horarioController.addListener(_onHorarioChanged);
   }
 
   @override
@@ -50,47 +46,48 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
     _nombreController.dispose();
     _dosisController.dispose();
     _notasController.dispose();
-    _horarioController.removeListener(_onHorarioChanged);
     _horarioController.dispose();
     super.dispose();
   }
 
-  void _onHorarioChanged() {
-    final text = _horarioController.text.trim();
-    if (text.isEmpty) {
-      setState(() => _horarioStatus = _HorarioStatus.empty);
-      return;
-    }
-    setState(() {
-      _horarioStatus = _isValidHorario(text)
-          ? _HorarioStatus.valid
-          : _HorarioStatus.invalid;
-    });
-  }
-
-  // Valida formato h:mm AM/PM (ej: "8:30 AM", "2:30 PM")
+  // Valida formato HH:MM (ej: 08:30, 14:00)
   bool _isValidHorario(String text) {
-    final match = RegExp(
-      r'^(\d{1,2}):(\d{2})\s*(AM|PM|am|pm)$',
-    ).firstMatch(text.trim());
+    final match = RegExp(r'^(\d{1,2}):(\d{2})$').firstMatch(text.trim());
     if (match == null) return false;
     final hour = int.tryParse(match.group(1)!);
     final minute = int.tryParse(match.group(2)!);
     if (hour == null || minute == null) return false;
-    return hour >= 1 && hour <= 12 && minute >= 0 && minute <= 59;
+    return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59;
   }
 
-  // Convierte "h:mm AM/PM" → "HH:MM" para almacenamiento interno
-  String _normalize(String text) {
-    final match = RegExp(
-      r'^(\d{1,2}):(\d{2})\s*(AM|PM|am|pm)$',
-    ).firstMatch(text.trim())!;
-    int hour = int.parse(match.group(1)!);
-    final minute = match.group(2)!;
-    final period = match.group(3)!.toUpperCase();
-    if (period == 'AM' && hour == 12) hour = 0;
-    if (period == 'PM' && hour != 12) hour += 12;
-    return '${hour.toString().padLeft(2, '0')}:$minute';
+  void _addHorario() {
+    final text = _horarioController.text.trim();
+    if (text.isEmpty) return;
+
+    if (!_isValidHorario(text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Formato inválido. Usa HH:MM (ej: 08:30)')),
+      );
+      return;
+    }
+
+    // Normalizar a HH:MM con dos dígitos
+    final parts = text.split(':');
+    final normalized =
+        '${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}';
+
+    if (_horarios.contains(normalized)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Este horario ya fue agregado')),
+      );
+      return;
+    }
+
+    setState(() {
+      _horarios.add(normalized);
+      _horarios.sort();
+      _horarioController.clear();
+    });
   }
 
   // Convierte HH:MM a h:mm AM/PM para mostrar
@@ -105,27 +102,6 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
       hour -= 12;
     }
     return '$hour:$minute $period';
-  }
-
-  void _addHorario() {
-    final text = _horarioController.text.trim();
-    if (text.isEmpty) return;
-    if (!_isValidHorario(text)) return;
-
-    final normalized = _normalize(text);
-    if (_horarios.contains(normalized)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Este horario ya fue agregado')),
-      );
-      return;
-    }
-
-    setState(() {
-      _horarios.add(normalized);
-      _horarios.sort();
-      _horarioController.clear();
-      _horarioStatus = _HorarioStatus.empty;
-    });
   }
 
   Future<void> _handleSubmit() async {
@@ -172,9 +148,7 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              _isEditing
-                  ? 'Medicamento actualizado'
-                  : 'Medicamento guardado',
+              _isEditing ? 'Medicamento actualizado' : 'Medicamento guardado',
             ),
           ),
         );
@@ -232,45 +206,53 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
               ),
               const SizedBox(height: 20),
 
-              // ─── Horarios ────────────────────────────────────────────────
+              // ─── Horarios ──────────────────────────────────────────────
               const _Label('Horarios de consumo'),
               const SizedBox(height: 4),
               Text(
-                'Formato: h:mm AM/PM  (ej: 8:00 AM, 2:30 PM, 9:00 PM)',
+                'Ingresa la hora en 24h: HH:MM (ej: 08:00, 14:30). Se mostrara en AM/PM.',
                 style: GoogleFonts.inter(
-                    fontSize: 14, color: AppColors.textSecondary),
+                    fontSize: 13, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 10),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: TextFormField(
+                    child: TextField(
                       controller: _horarioController,
-                      decoration: InputDecoration(
-                        hintText: 'ej: 8:00 AM',
-                        prefixIcon: const Icon(Icons.schedule_rounded),
-                        // ─── Indicador check / X ──────────────────────────
-                        suffixIcon: _buildStatusIcon(),
+                      readOnly: true,
+                      onTap: () async {
+                        final picked = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                        );
+                        if (picked != null) {
+                          final h = picked.hour.toString().padLeft(2, '0');
+                          final m = picked.minute.toString().padLeft(2, '0');
+                          _horarioController.text = '$h:$m';
+                          _addHorario();
+                        }
+                      },
+                      decoration: const InputDecoration(
+                        hintText: 'Toca para seleccionar hora',
+                        prefixIcon: Icon(Icons.schedule_rounded),
                       ),
-                      keyboardType: TextInputType.datetime,
-                      onFieldSubmitted: (_) => _addHorario(),
                     ),
                   ),
                   const SizedBox(width: 10),
-                  SizedBox(
-                    height: 54,
-                    child: ElevatedButton(
-                      onPressed: _horarioStatus == _HorarioStatus.valid
-                          ? _addHorario
-                          : null,
-                      child: const Text('Agregar'),
+                  ElevatedButton(
+                    onPressed: _addHorario,
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(88, 56),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                     ),
+                    child: const Text('Agregar'),
                   ),
                 ],
               ),
 
-              // ─── Chips de horarios agregados ──────────────────────────
+              // ─── Chips de horarios ────────────────────────────────────
               if (_horarios.isNotEmpty) ...[
                 const SizedBox(height: 14),
                 Wrap(
@@ -339,22 +321,7 @@ class _MedicamentoFormScreenState extends State<MedicamentoFormScreen> {
       ),
     );
   }
-
-  Widget? _buildStatusIcon() {
-    switch (_horarioStatus) {
-      case _HorarioStatus.valid:
-        return const Icon(Icons.check_circle_rounded,
-            color: Color(0xFF52C4A0), size: 22);
-      case _HorarioStatus.invalid:
-        return const Icon(Icons.cancel_rounded,
-            color: AppColors.error, size: 22);
-      case _HorarioStatus.empty:
-        return null;
-    }
-  }
 }
-
-enum _HorarioStatus { empty, valid, invalid }
 
 // ─── Widgets auxiliares ───────────────────────────────────────────────────────
 
