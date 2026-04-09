@@ -170,16 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // ─── Menú principal ───────────────────────────────────────
                 const _SectionTitle('¿Qué deseas hacer?'),
                 const SizedBox(height: 12),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final ratio = constraints.maxWidth < 340 ? 0.85 : 0.92;
-                    return GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  mainAxisSpacing: 14,
-                  crossAxisSpacing: 14,
-                  childAspectRatio: ratio,
+                Column(
                   children: [
                     _MenuTile(
                       icon: Icons.medication_rounded,
@@ -222,8 +213,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       )),
                     ),
                   ],
-                );
-                  },
                 ),
 
                 const SizedBox(height: 32),
@@ -338,50 +327,58 @@ class _MenuTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Material(
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        child: Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.divider),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.divider),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: bgColor,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(icon, color: color, size: 24),
                 ),
-                child: Icon(icon, color: color, size: 26),
-              ),
-              const Spacer(),
-              Text(
-                label,
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                subtitle,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+                Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary, size: 22),
+              ],
+            ),
           ),
         ),
       ),
